@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Assistive AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+        }
+
+        .container {
+            padding: 20px;
+        }
+
+        video {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 10px;
+            border: 3px solid #2c3e50;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: #3498db;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .results {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 16px;
+        }
+
+        footer {
+            margin-top: 40px;
+            padding: 10px;
+            background-color: #2c3e50;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Smart Assistive AI</h1>
+    <p>All-in-One Multimodal Assistive System</p>
+</header>
+
+<div class="container">
+
+    <!-- Camera Section -->
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" style="display:none;"></canvas>
+
+    <div>
+        <button onclick="startCamera()">Start Camera</button>
+        <button onclick="captureImage()">Capture Image</button>
+        <button onclick="analyzeImage()">Analyze</button>
+    </div>
+
+    <!-- Results -->
+    <div class="results">
+        <h2>Detected Objects</h2>
+        <p id="objects">No objects detected yet.</p>
+
+        <h2>Extracted Text</h2>
+        <p id="text">No text detected yet.</p>
+
+        <h2>Contextual Message</h2>
+        <p id="context">No contextual message yet.</p>
+    </div>
+
+</div>
+
+<footer>
+    © 2026 Smart Assistive AI Project
+</footer>
+
+<script>
+    const video = document.getElementById("video");
+    const canvas = document.getElementById("canvas");
+
+    async function startCamera() {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        video.srcObject = stream;
+    }
+
+    function captureImage() {
+        const context = canvas.getContext("2d");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0);
+        alert("Image Captured!");
+    }
+
+    async function analyzeImage() {
+        const imageData = canvas.toDataURL("image/png");
+
+        const response = await fetch("http://127.0.0.1:5000/analyze", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ image: imageData })
+        });
+
+        const result = await response.json();
+
+        document.getElementById("objects").innerText = result.objects || "No objects detected.";
+        document.getElementById("text").innerText = result.text || "No text detected.";
+        document.getElementById("context").innerText = result.context || "No contextual message.";
+    }
+</script>
+
+</body>
+</html>
